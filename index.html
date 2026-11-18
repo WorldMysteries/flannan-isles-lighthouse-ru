@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Маяк Фланнанских островов — Три человека исчезли посреди океана</title>
+<meta name="description" content="Тайна исчезновения трёх смотрителей маяка Фланнанских островов в декабре 1900 года. Интерактивное расследование на чистом HTML, CSS и JS.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04070d;
+  --bg2:#070d18;
+  --bg3:#0a1220;
+  --ink:#ece5d3;
+  --ink-dim:#9aa8bc;
+  --ink-faint:#5c6b82;
+  --amber:#d9a441;
+  --amber2:#f0c96a;
+  --line:rgba(236,229,211,.14);
+  --line2:rgba(236,229,211,.08);
+  --card:#0b1424;
+  --red:#c84b3a;
+  --serif:'Cormorant Garamond', Georgia, serif;
+  --sans:'Manrope', system-ui, sans-serif;
+  --mono:'JetBrains Mono', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:var(--amber);color:#0a0f18}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+img{display:block;max-width:100%}
+
+/* progress */
+#progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--amber),var(--amber2));width:0%;z-index:200;transition:width .1s linear}
+
+/* header */
+header{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:18px 28px;transition:.4s;border-bottom:1px solid transparent}
+header.scrolled{background:rgba(4,7,13,.82);backdrop-filter:blur(16px);border-bottom-color:var(--line2);padding:12px 28px}
+.logo{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+.logo-mark{width:34px;height:34px;border:1px solid var(--line);display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.03)}
+.logo-mark span{width:8px;height:8px;background:var(--amber);border-radius:50%;box-shadow:0 0 12px var(--amber);animation:pulse 2.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+nav{display:flex;gap:26px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--ink-dim)}
+nav a{position:relative;padding:4px 0;transition:.3s}
+nav a:hover{color:var(--ink)}
+nav a::after{content:'';position:absolute;left:0;bottom:0;width:0;height:1px;background:var(--amber);transition:.3s}
+nav a:hover::after{width:100%}
+.header-right{display:flex;align-items:center;gap:12px}
+.sound-btn{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--ink);padding:9px 14px;border-radius:100px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;transition:.3s}
+.sound-btn:hover{border-color:var(--amber);color:var(--amber2)}
+.sound-btn.active{background:var(--amber);color:#0a0f18;border-color:var(--amber)}
+@media(max-width:900px){nav{display:none}}
+
+/* HERO */
+#hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;background:radial-gradient(120% 90% at 50% 0%, #0e1b30 0%, #070d18 45%, #04070d 100%)}
+#stars{position:absolute;inset:0;pointer-events:none}
+.star{position:absolute;background:#fff;border-radius:50%;opacity:.7;animation:twinkle 3s infinite}
+@keyframes twinkle{0%,100%{opacity:.2}50%{opacity:.9}}
+.moon{position:absolute;top:12%;right:14%;width:72px;height:72px;border-radius:50%;background:radial-gradient(circle at 35% 35%, #fff8e6, #e8d9a8 60%, #c9b87a);box-shadow:0 0 60px rgba(240,201,106,.35),0 0 120px rgba(240,201,106,.15);opacity:.9}
+.moon::after{content:'';position:absolute;inset:0;border-radius:50%;box-shadow:inset -14px -6px 0 rgba(0,0,0,.12)}
+#lightning{position:absolute;inset:0;background:#dbeafe;opacity:0;pointer-events:none;z-index:3}
+.hero-inner{position:relative;z-index:10;padding:120px 28px 0;max-width:1280px;margin:0 auto;width:100%}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber2);border:1px solid rgba(217,164,65,.35);padding:8px 14px;border-radius:100px;background:rgba(217,164,65,.06);backdrop-filter:blur(6px)}
+.eyebrow i{width:6px;height:6px;background:var(--amber);border-radius:50%;display:inline-block;animation:pulse 1.8s infinite}
+h1{font-family:var(--serif);font-weight:500;line-height:.88;letter-spacing:-.02em;margin-top:22px}
+h1 .line1{display:block;font-size:clamp(52px,9.5vw,132px);text-transform:uppercase}
+h1 .line2{display:block;font-size:clamp(52px,9.5vw,132px);text-transform:uppercase;color:transparent;-webkit-text-stroke:1.5px rgba(236,229,211,.85)}
+h1 .line3{display:block;font-size:clamp(28px,4.2vw,58px);font-style:italic;font-weight:400;color:var(--amber2);margin-top:10px;letter-spacing:0;text-transform:none}
+.hero-sub{max-width:620px;color:var(--ink-dim);font-size:16px;line-height:1.7;margin-top:22px}
+.hero-sub strong{color:var(--ink)}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:15px 26px;border-radius:100px;font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;transition:.3s;border:1px solid transparent}
+.btn-amber{background:var(--amber);color:#0a0f18}
+.btn-amber:hover{background:var(--amber2);transform:translateY(-2px);box-shadow:0 12px 30px rgba(217,164,65,.25)}
+.btn-ghost{background:rgba(255,255,255,.04);border-color:var(--line);color:var(--ink);backdrop-filter:blur(8px)}
+.btn-ghost:hover{border-color:var(--amber);color:var(--amber2)}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line2);border:1px solid var(--line2);margin-top:36px;max-width:860px}
+.stat{background:rgba(4,7,13,.55);backdrop-filter:blur(10px);padding:18px 20px}
+.stat b{font-family:var(--serif);font-size:32px;font-weight:600;display:block;line-height:1}
+.stat span{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);display:block;margin-top:6px}
+@media(max-width:700px){.hero-stats{grid-template-columns:1fr 1fr}}
+
+/* lighthouse scene */
+.scene{position:relative;height:340px;margin-top:10px;z-index:5}
+#oceanCanvas{position:absolute;left:0;right:0;bottom:0;width:100%;height:220px}
+.lighthouse-wrap{position:absolute;left:50%;bottom:110px;transform:translateX(-50%);width:280px;z-index:6;filter:drop-shadow(0 20px 40px rgba(0,0,0,.6))}
+.lighthouse-wrap svg{width:100%;height:auto;display:block}
+.fog{position:absolute;left:-10%;right:-10%;height:140px;pointer-events:none;z-index:7;background:radial-gradient(50% 100% at 50% 50%, rgba(200,215,235,.16), transparent 70%);filter:blur(6px)}
+.fog.f1{bottom:120px;animation:drift 14s ease-in-out infinite alternate}
+.fog.f2{bottom:60px;opacity:.7;animation:drift 18s ease-in-out infinite alternate-reverse}
+@keyframes drift{from{transform:translateX(-3%)}to{transform:translateX(3%)}}
+.beam-glow{position:absolute;left:50%;top:18px;width:420px;height:420px;transform:translate(-50%,-50%);pointer-events:none;z-index:4;background:conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(240,201,106,.14) 18deg, transparent 36deg, transparent 180deg, rgba(240,201,106,.14) 198deg, transparent 216deg);border-radius:50%;mix-blend-mode:screen}
+
+/* storm control */
+.storm-panel{position:absolute;right:28px;bottom:28px;z-index:20;width:300px;background:rgba(7,13,24,.72);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:18px;padding:18px}
+.storm-panel h4{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
+.storm-panel h4 em{font-style:normal;color:var(--amber2);font-size:13px}
+.storm-panel p{font-size:12px;color:var(--ink-dim);line-height:1.5;margin-top:8px}
+input[type=range]{width:100%;margin-top:14px;appearance:none;height:4px;background:linear-gradient(90deg,#2a3a55,var(--amber));border-radius:100px;outline:none}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;border-radius:50%;background:var(--amber2);border:3px solid #0a0f18;box-shadow:0 0 0 1px var(--amber),0 4px 14px rgba(0,0,0,.5);cursor:pointer}
+.storm-labels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--ink-faint);margin-top:8px;letter-spacing:.1em;text-transform:uppercase}
+.storm-status{margin-top:12px;font-family:var(--mono);font-size:11px;padding:8px 10px;background:rgba(255,255,255,.04);border-radius:8px;border:1px solid var(--line2);display:flex;justify-content:space-between}
+@media(max-width:800px){.storm-panel{position:relative;right:auto;bottom:auto;margin:20px 16px 24px;width:auto}.scene{height:260px}.lighthouse-wrap{width:200px;bottom:80px}}
+
+/* marquee */
+.marquee{border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);overflow:hidden;background:#060b14;padding:14px 0;white-space:nowrap}
+.marquee-track{display:inline-flex;gap:48px;animation:scroll 28s linear infinite;font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint)}
+.marquee-track b{color:var(--amber)}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* sections */
+section{position:relative;padding:110px 28px}
+.wrap{max-width:1280px;margin:0 auto}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:48px;flex-wrap:wrap}
+.sec-num{font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--amber);text-transform:uppercase;display:flex;align-items:center;gap:12px}
+.sec-num::after{content:'';width:60px;height:1px;background:var(--amber);display:inline-block}
+h2{font-family:var(--serif);font-size:clamp(38px,5.5vw,68px);line-height:.95;font-weight:500;margin-top:14px}
+h2 i{color:var(--amber2);font-weight:400}
+.sec-desc{max-width:420px;color:var(--ink-dim);line-height:1.7;font-size:15px}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .8s ease,transform .8s ease}
+.reveal.visible{opacity:1;transform:none}
+
+/* prologue */
+#prologue{background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
+.prologue-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center}
+@media(max-width:900px){.prologue-grid{grid-template-columns:1fr}}
+.big-text{font-family:var(--serif);font-size:clamp(24px,3vw,36px);line-height:1.35;font-weight:400}
+.big-text em{color:var(--amber2)}
+.body-text{color:var(--ink-dim);line-height:1.8;margin-top:22px;font-size:15px}
+.body-text + .body-text{margin-top:14px}
+.img-frame{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--line);aspect-ratio:4/3;background:#0a1220}
+.img-frame img{width:100%;height:100%;object-fit:cover;filter:grayscale(.4) contrast(1.05) brightness(.85);transition:transform 1.2s ease,filter .6s}
+.img-frame:hover img{transform:scale(1.06);filter:grayscale(0) brightness(.95)}
+.img-caption{position:absolute;left:16px;bottom:16px;right:16px;display:flex;justify-content:space-between;align-items:center;background:rgba(4,7,13,.72);backdrop-filter:blur(10px);border:1px solid var(--line2);border-radius:12px;padding:12px 14px;font-family:var(--mono);font-size:11px;letter-spacing:.08em}
+.img-caption b{color:var(--amber2)}
+.coords{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.1em;padding:9px 13px;border:1px solid var(--line);border-radius:100px;color:var(--ink-dim);background:rgba(255,255,255,.03)}
+.chip b{color:var(--ink)}
+
+/* keepers */
+#keepers{background:#060b14}
+.keepers-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:900px){.keepers-grid{grid-template-columns:1fr}}
+.keeper{position:relative;background:linear-gradient(180deg,#0d1729,#080f1d);border:1px solid var(--line2);border-radius:20px;padding:28px;overflow:hidden;transition:transform .4s ease,border-color .4s;transform-style:preserve-3d;will-change:transform}
+.keeper:hover{border-color:rgba(217,164,65,.45)}
+.keeper::before{content:attr(data-num);position:absolute;top:10px;right:18px;font-family:var(--serif);font-size:90px;line-height:1;color:transparent;-webkit-text-stroke:1px rgba(236,229,211,.12);font-weight:700}
+.monogram{width:64px;height:64px;border-radius:50%;border:1px solid rgba(217,164,65,.5);display:grid;place-items:center;font-family:var(--serif);font-size:24px;color:var(--amber2);background:rgba(217,164,65,.07);margin-bottom:20px}
+.keeper h3{font-family:var(--serif);font-size:30px;font-weight:600;line-height:1}
+.keeper .role{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin-top:8px}
+.keeper p{color:var(--ink-dim);line-height:1.7;font-size:14px;margin-top:16px}
+.keeper .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.keeper .meta span{font-family:var(--mono);font-size:10px;letter-spacing:.08em;padding:6px 9px;border:1px solid var(--line2);border-radius:100px;color:var(--ink-dim)}
+.keeper .quote{margin-top:20px;padding-top:18px;border-top:1px dashed var(--line);font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ink);line-height:1.4}
+.keeper .quote small{display:block;font-family:var(--mono);font-style:normal;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-top:8px}
+
+/* logbook */
+#chronicle{background:linear-gradient(180deg,#060b14,#04070d)}
+.logbook-layout{display:grid;grid-template-columns:280px 1fr;gap:22px}
+@media(max-width:900px){.logbook-layout{grid-template-columns:1fr}}
+.log-dates{display:flex;flex-direction:column;gap:10px}
+.log-date-btn{text-align:left;background:rgba(255,255,255,.03);border:1px solid var(--line2);color:var(--ink-dim);padding:16px 18px;border-radius:14px;transition:.3s}
+.log-date-btn b{font-family:var(--serif);font-size:20px;color:var(--ink);display:block}
+.log-date-btn span{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+.log-date-btn.active{background:var(--amber);border-color:var(--amber);color:#0a0f18}
+.log-date-btn.active b,.log-date-btn.active span{color:#0a0f18}
+.log-date-btn:hover{border-color:var(--amber);transform:translateX(4px)}
+.log-paper{background:#f3ead6;color:#1a1f2a;border-radius:18px;padding:32px;position:relative;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.log-paper::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 31px,rgba(0,0,0,.04) 32px);pointer-events:none}
+.log-paper::after{content:'FLANNAN LIGHT';position:absolute;top:18px;right:22px;font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:rgba(0,0,0,.25)}
+.log-top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:2px solid rgba(0,0,0,.12);padding-bottom:16px;margin-bottom:20px;position:relative;z-index:1}
+.log-top h3{font-family:var(--serif);font-size:28px}
+.log-top .weather{font-family:var(--mono);font-size:11px;text-align:right;line-height:1.6}
+.log-text{font-family:var(--mono);font-size:15px;line-height:1.9;min-height:150px;position:relative;z-index:1;white-space:pre-wrap}
+.log-text::after{content:'▌';animation:blink 1s infinite;color:var(--amber)}
+@keyframes blink{50%{opacity:0}}
+.log-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:22px;padding-top:16px;border-top:1px dashed rgba(0,0,0,.15);position:relative;z-index:1;flex-wrap:wrap}
+.badge{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:7px 10px;border-radius:100px;background:#1a1f2a;color:#f3ead6}
+.badge.warn{background:#c84b3a}
+.storm-bar{flex:1;min-width:160px;height:8px;background:rgba(0,0,0,.12);border-radius:100px;overflow:hidden}
+.storm-bar i{display:block;height:100%;background:linear-gradient(90deg,#5a7aa8,#c84b3a);width:0%;transition:width .8s ease}
+.log-note{font-size:12px;color:rgba(0,0,0,.55);font-family:var(--mono)}
+
+/* evidence */
+#evidence{background:#060b14}
+.evidence-layout{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:900px){.evidence-layout{grid-template-columns:1fr}}
+.clues{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:560px){.clues{grid-template-columns:1fr}}
+.clue-btn{text-align:left;background:rgba(255,255,255,.03);border:1px solid var(--line2);border-radius:14px;padding:16px;color:var(--ink);transition:.3s}
+.clue-btn small{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
+.clue-btn b{display:block;font-family:var(--serif);font-size:19px;margin-top:6px;line-height:1.2}
+.clue-btn span{font-size:12px;color:var(--ink-dim);display:block;margin-top:6px;line-height:1.5}
+.clue-btn.active{border-color:var(--amber);background:rgba(217,164,65,.08)}
+.clue-btn:hover{transform:translateY(-2px);border-color:var(--amber)}
+.clue-detail{background:linear-gradient(180deg,#0d1729,#080f1d);border:1px solid var(--line);border-radius:20px;padding:28px;position:sticky;top:90px}
+.clue-detail .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber)}
+.clue-detail h3{font-family:var(--serif);font-size:32px;margin-top:10px;line-height:1.05}
+.clue-detail p{color:var(--ink-dim);line-height:1.8;margin-top:14px;font-size:15px}
+.clue-detail .fact{margin-top:20px;background:rgba(217,164,65,.08);border:1px solid rgba(217,164,65,.3);border-radius:12px;padding:14px;font-family:var(--mono);font-size:12px;line-height:1.6;color:var(--amber2)}
+.clue-img{margin-top:20px;border-radius:14px;overflow:hidden;border:1px solid var(--line2);aspect-ratio:16/9}
+.clue-img img{width:100%;height:100%;object-fit:cover;filter:grayscale(.5) brightness(.85)}
+
+/* theories */
+#theories{background:linear-gradient(180deg,#060b14,#04070d)}
+.theories-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+@media(max-width:800px){.theories-grid{grid-template-columns:1fr}}
+.theory{background:rgba(255,255,255,.03);border:1px solid var(--line2);border-radius:20px;padding:26px;transition:.3s}
+.theory:hover{border-color:var(--line);transform:translateY(-3px)}
+.theory-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.theory h3{font-family:var(--serif);font-size:26px;line-height:1.1}
+.theory .tag{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:6px 9px;border-radius:100px;border:1px solid var(--line);color:var(--ink-dim);white-space:nowrap}
+.theory p{color:var(--ink-dim);line-height:1.7;font-size:14px;margin-top:12px}
+.vote-row{display:flex;align-items:center;gap:12px;margin-top:20px}
+.vote-btn{background:var(--amber);color:#0a0f18;border:none;padding:11px 18px;border-radius:100px;font-weight:800;font-size:12px;letter-spacing:.08em;text-transform:uppercase;transition:.3s}
+.vote-btn:hover{background:var(--amber2)}
+.vote-btn.voted{background:#1a2a44;color:var(--amber2);border:1px solid var(--amber)}
+.vote-bar{flex:1;height:8px;background:rgba(255,255,255,.07);border-radius:100px;overflow:hidden}
+.vote-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--amber),var(--amber2));width:0%;transition:width 1s ease}
+.vote-pct{font-family:var(--mono);font-size:13px;min-width:48px;text-align:right}
+.vote-count{font-family:var(--mono);font-size:11px;color:var(--ink-faint)}
+
+/* investigation */
+#investigation{background:#060b14}
+.telegram{background:#f3ead6;color:#1a1f2a;border-radius:16px;padding:28px;position:relative;box-shadow:0 24px 60px rgba(0,0,0,.45);transform:rotate(-.6deg)}
+.telegram::before{content:'';position:absolute;top:0;left:0;right:0;height:6px;background:repeating-linear-gradient(90deg,#1a1f2a 0 12px,transparent 12px 24px);opacity:.15;border-radius:16px 16px 0 0}
+.telegram h3{font-family:var(--mono);font-size:12px;letter-spacing:.24em;text-transform:uppercase;border-bottom:2px solid rgba(0,0,0,.15);padding-bottom:12px}
+.telegram blockquote{font-family:var(--serif);font-size:clamp(20px,2.6vw,28px);line-height:1.4;font-style:italic;margin-top:18px}
+.telegram .from{font-family:var(--mono);font-size:12px;margin-top:16px;color:rgba(0,0,0,.6)}
+.invest-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+@media(max-width:900px){.invest-grid{grid-template-columns:1fr}}
+.timeline{margin-top:8px}
+.timeline-item{display:flex;gap:18px;padding:18px 0;border-bottom:1px dashed var(--line2)}
+.timeline-item:last-child{border:none}
+.timeline-date{font-family:var(--mono);font-size:12px;color:var(--amber);min-width:86px;line-height:1.4}
+.timeline-item h4{font-family:var(--serif);font-size:20px}
+.timeline-item p{color:var(--ink-dim);font-size:14px;line-height:1.6;margin-top:4px}
+.ship-card{background:linear-gradient(180deg,#0d1729,#080f1d);border:1px solid var(--line);border-radius:20px;padding:26px}
+.ship-card h3{font-family:var(--serif);font-size:28px}
+.ship-card p{color:var(--ink-dim);line-height:1.7;margin-top:12px;font-size:14px}
+.ship-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.ship-stats div{background:rgba(255,255,255,.04);border:1px solid var(--line2);border-radius:12px;padding:14px}
+.ship-stats b{font-family:var(--serif);font-size:22px;display:block}
+.ship-stats span{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
+
+/* footer */
+footer{border-top:1px solid var(--line2);padding:48px 28px 32px;background:#03050a}
+.footer-inner{max-width:1280px;margin:0 auto;display:flex;justify-content:space-between;gap:28px;flex-wrap:wrap}
+footer p{color:var(--ink-faint);font-size:13px;line-height:1.7;max-width:520px}
+footer .mono{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim)}
+.top-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:transparent;color:var(--ink);padding:12px 18px;border-radius:100px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;transition:.3s}
+.top-btn:hover{border-color:var(--amber);color:var(--amber2)}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<header id="header">
+  <a class="logo" href="#hero"><span class="logo-mark"><span></span></span> Flannan · 1900</a>
+  <nav>
+    <a href="#prologue">Пролог</a>
+    <a href="#keepers">Смотрители</a>
+    <a href="#chronicle">Журнал</a>
+    <a href="#evidence">Улики</a>
+    <a href="#theories">Теории</a>
+  </nav>
+  <div class="header-right">
+    <button class="sound-btn" id="soundBtn" aria-label="Включить звук океана">◉ Звук океана</button>
+  </div>
+</header>
+
+<main>
+<!-- HERO -->
+<section id="hero" style="padding:0">
+  <div id="stars"></div>
+  <div class="moon"></div>
+  <div id="lightning"></div>
+
+  <div class="hero-inner">
+    <span class="eyebrow"><i></i> Атлантический океан · 59°31′ N 7°35′ W</span>
+    <h1>
+      <span class="line1">Маяк</span>
+      <span class="line2">Фланнанских</span>
+      <span class="line2">островов</span>
+      <span class="line3">— три человека исчезли посреди океана</span>
+    </h1>
+    <p class="hero-sub">В декабре 1900 года свет маяка на скале в 30 километрах от Шотландии внезапно погас. Когда спасательный корабль <strong>«Hesperus»</strong> добрался до острова, там не было ни души. Дверь была заперта изнутри. Часы остановились. Тела не нашли никогда.</p>
+    <div class="hero-cta">
+      <a class="btn btn-amber" href="#chronicle">Начать расследование ↓</a>
+      <a class="btn btn-ghost" href="#theories">Версии исчезновения</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><b data-count="3">0</b><span>смотрителя исчезли</span></div>
+      <div class="stat"><b data-count="11">0</b><span>дней тишины</span></div>
+      <div class="stat"><b data-count="215">0</b><span>футов над морем</span></div>
+      <div class="stat"><b data-count="0">0</b><span>тел найдено</span></div>
+    </div>
+  </div>
+
+  <div class="scene" id="scene">
+    <div class="beam-glow" id="beamGlow"></div>
+    <div class="lighthouse-wrap" id="lighthouseWrap">
+      <svg viewBox="0 0 280 220" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="beamGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#f0c96a" stop-opacity=".9"/>
+            <stop offset="100%" stop-color="#f0c96a" stop-opacity="0"/>
+          </linearGradient>
+          <linearGradient id="towerGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#e8e0cc"/>
+            <stop offset="55%" stop-color="#f5efe0"/>
+            <stop offset="100%" stop-color="#c9bfa5"/>
+          </linearGradient>
+        </defs>
+        <g id="beamGroup" style="transform-origin:140px 42px">
+          <polygon points="140,42 20,18 20,66" fill="url(#beamGrad)" opacity=".55"/>
+          <polygon points="140,42 260,18 260,66" fill="url(#beamGrad)" opacity=".55"/>
+        </g>
+        <polygon points="30,220 70,150 210,150 250,220" fill="#0d1626"/>
+        <polygon points="55,220 85,165 195,165 225,220" fill="#111f36"/>
+        <rect x="118" y="52" width="44" height="102" rx="4" fill="url(#towerGrad)"/>
+        <rect x="118" y="78" width="44" height="10" fill="#1a2a44" opacity=".9"/>
+        <rect x="118" y="108" width="44" height="10" fill="#1a2a44" opacity=".9"/>
+        <rect x="132" y="122" width="16" height="28" rx="8" fill="#0a1220"/>
+        <rect x="112" y="38" width="56" height="16" rx="3" fill="#0a1220"/>
+        <rect x="120" y="24" width="40" height="16" rx="2" fill="#f0c96a"/>
+        <circle cx="140" cy="32" r="7" fill="#fff3c4"/>
+        <polygon points="120,24 140,6 160,24" fill="#0a1220"/>
+        <rect x="138" y="0" width="4" height="10" fill="#0a1220"/>
+        <ellipse cx="140" cy="218" rx="120" ry="10" fill="#04070d" opacity=".6"/>
+      </svg>
+    </div>
+    <canvas id="oceanCanvas"></canvas>
+    <div class="fog f1" id="fog1"></div>
+    <div class="fog f2" id="fog2"></div>
+  </div>
+
+  <div class="storm-panel">
+    <h4>Сила шторма <em id="stormVal">35%</em></h4>
+    <p>Двигайте ползунок — океан, дождь и туман на этой странице реагируют в реальном времени.</p>
+    <input type="range" id="stormRange" min="0" max="100" value="35" aria-label="Сила шторма">
+    <div class="storm-labels"><span>Штиль</span><span>Шторм</span><span>Ураган</span></div>
+    <div class="storm-status"><span id="stormText">Ветер: свежий</span><span id="waveText">Волны: 2 м</span></div>
+  </div>
+</section>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track" id="marqueeTrack">
+    <span>Декабрь 1900 <b>•</b> Три смотрителя <b>•</b> Один маяк <b>•</b> Ни одного тела <b>•</b> Часы остановились <b>•</b> Archtor <b>•</b> Hesperus <b>•</b> Eilean Mòr <b>•</b></span>
+    <span>Декабрь 1900 <b>•</b> Три смотрителя <b>•</b> Один маяк <b>•</b> Ни одного тела <b>•</b> Часы остановились <b>•</b> Archtor <b>•</b> Hesperus <b>•</b> Eilean Mòr <b>•</b></span>
+  </div>
+</div>
+
+<!-- PROLOGUE -->
+<section id="prologue">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div>
+        <div class="sec-num">01 — Пролог</div>
+        <h2>Скала, где <i>нельзя</i><br>остаться одному</h2>
+      </div>
+      <p class="sec-desc">Фланнанские острова — семь голых скал в Атлантике. Маяк построили в 1899 году, чтобы корабли не разбивались о рифы. Он проработал всего год.</p>
+    </div>
+    <div class="prologue-grid">
+      <div class="reveal">
+        <p class="big-text">30 километров от берега. <em>Никаких деревьев, никаких дорог.</em> Только ветер, чайки и 160 ступеней вверх по скале.</p>
+        <p class="body-text">Маяк на острове Эилеан Мор высотой 23 метра и на 65 метров выше моря. Смотрители жили в башне по двое-трое, сменяясь раз в два месяца. Снаружи — открытая Атлантика. Внутри — керосиновая лампа, журнал и тишина, которую раз в несколько минут разрывал луч света.</p>
+        <p class="body-text">15 декабря 1900 года пароход <strong style="color:var(--ink)">«Archtor»</strong>, шедший из Филадельфии в Лит, прошёл мимо островов и записал в бортовой журнал: <em>«Свет маяка не горит»</em>. На берегу это сочли временной поломкой. Никто не знал, что лампа уже никогда не зажжётся от рук её смотрителей.</p>
+        <div class="coords">
+          <span class="chip"><b>59°31′ N</b> · 7°35′ W</span>
+          <span class="chip"><b>30 км</b> от острова Льюис</span>
+          <span class="chip"><b>1899</b> — первый свет</span>
+          <span class="chip"><b>1900</b> — исчезновение</span>
+        </div>
+      </div>
+      <div class="img-frame reveal">
+        <img src="https://images.pexels.com/photos/16277006/pexels-photo-16277006.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200" alt="Маяк в грозу ночью">
+        <div class="img-caption"><span><b>АТЛАНТИКА</b> · ШТОРМ</span><span>15.12.1900</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KEEPERS -->
+<section id="keepers">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div>
+        <div class="sec-num">02 — Смотрители</div>
+        <h2>Трое, кто <i>не вернулся</i></h2>
+      </div>
+      <p class="sec-desc">Их знал в лицо суперинтендант Северного управления маяков Роберт Мьюрхед — он сам отбирал всех троих. Наведите курсор на карточку.</p>
+    </div>
+    <div class="keepers-grid">
+      <article class="keeper reveal" data-num="01">
+        <div class="monogram">JD</div>
+        <h3>Джеймс Дюкат</h3>
+        <div class="role">Главный смотритель · 38 лет</div>
+        <p>Опытный маячник, отвечал за лампу и журнал. По воспоминаниям коллег — тихий, надёжный, не из тех, кто паникует в шторм. Его oilskins на острове не нашли.</p>
+        <div class="meta"><span>Стаж: 10+ лет</span><span>Ответственный</span><span>Шотландия</span></div>
+        <div class="quote">«Он знал море лучше, чем себя.»<small>— из показаний Мьюрхеда</small></div>
+      </article>
+      <article class="keeper reveal" data-num="02">
+        <div class="monogram">TM</div>
+        <h3>Томас Маршалл</h3>
+        <div class="role">Второй смотритель · 48 лет</div>
+        <p>Самый старший из троих. Двадцать лет прослужил на маяках. Именно ему приписывают поздние записи в журнале о «ветрах, каких не видел за двадцать лет» — позже выяснилось, что записи вымышлены.</p>
+        <div class="meta"><span>Стаж: 20 лет</span><span>Ветеран</span><span>Шотландия</span></div>
+        <div class="quote">«Сильные ветры, каких я не видел за двадцать лет.»<small>— приписываемая запись, 12 декабря</small></div>
+      </article>
+      <article class="keeper reveal" data-num="03">
+        <div class="monogram">DM</div>
+        <h3>Дональд МакАртур</h3>
+        <div class="role">Третий · «Occasional» · 40 лет</div>
+        <p>Моряк с репутацией вспыльчивого человека, любил драки. Его плащ остался внутри башни — значит, он либо вышел без защиты, либо не собирался выходить. Самая загадочная деталь.</p>
+        <div class="meta"><span>Вспыльчивый</span><span>Моряк</span><span>Плащ на месте</span></div>
+        <div class="quote">«Он бы никогда не заплакал из-за шторма.»<small>— коллеги о МакАртуре</small></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- CHRONICLE / LOGBOOK -->
+<section id="chronicle">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div>
+        <div class="sec-num">03 — Хроника</div>
+        <h2>Журнал, который <i>замолчал</i></h2>
+      </div>
+      <p class="sec-desc">Нажмите на дату, чтобы прочитать запись. Последняя строка в журнале — самая страшная: она звучит как прощание.</p>
+    </div>
+    <div class="logbook-layout reveal">
+      <div class="log-dates" id="logDates"></div>
+      <div class="log-paper">
+        <div class="log-top">
+          <div>
+            <div style="font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(0,0,0,.5)">Журнал смотрителей · Eilean Mòr</div>
+            <h3 id="logTitle">—</h3>
+          </div>
+          <div class="weather" id="logWeather">—</div>
+        </div>
+        <div class="log-text" id="logText"></div>
+        <div class="log-foot">
+          <span class="badge" id="logBadge">Запись</span>
+          <div class="storm-bar"><i id="logStormBar"></i></div>
+          <span class="log-note" id="logNote">Шторм: —</span>
+        </div>
+      </div>
+    </div>
+    <p style="margin-top:16px;font-family:var(--mono);font-size:12px;color:var(--ink-faint);line-height:1.7" class="reveal">⚠ Историческая справка: расследование журналиста Майка Дэша для Fortean Times показало, что «эмоциональные» записи от 12–15 декабря, скорее всего, были выдуманы позже и не являются подлинным журналом. Подлинны лишь факты: свет погас, люди исчезли, тела не найдены.</p>
+  </div>
+</section>
+
+<!-- EVIDENCE -->
+<section id="evidence">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div>
+        <div class="sec-num">04 — Улики</div>
+        <h2>Что нашёл <i>Джозеф Мур</i></h2>
+      </div>
+      <p class="sec-desc">26 декабря сменный смотритель Мур поднялся по 160 ступеням и вошёл в башню. Вот что он увидел — нажмите, чтобы изучить каждую улику.</p>
+    </div>
+    <div class="evidence-layout">
+      <div class="clues reveal" id="cluesGrid"></div>
+      <aside class="clue-detail reveal" id="clueDetail">
+        <div class="kicker" id="clueKicker">Улика 01</div>
+        <h3 id="clueTitle">Остановившиеся часы</h3>
+        <p id="clueText">—</p>
+        <div class="fact" id="clueFact">—</div>
+        <div class="clue-img"><img id="clueImg" src="https://images.pexels.com/photos/33869109/pexels-photo-33869109.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200" alt="Маяк в шторм"></div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- THEORIES -->
+<section id="theories">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div>
+        <div class="sec-num">05 — Теории</div>
+        <h2>Куда делись <i>трое мужчин?</i></h2>
+      </div>
+      <p class="sec-desc">Более 120 лет версии спорят друг с другом. Проголосуйте за ту, в которую верите вы. Голоса считаются на этой странице в реальном времени.</p>
+    </div>
+    <div class="theories-grid" id="theoriesGrid"></div>
+    <p style="margin-top:18px;font-family:var(--mono);font-size:12px;color:var(--ink-faint)" class="reveal" id="totalVotes">Всего голосов: 0 · Нажмите «Поддерживаю», чтобы проголосовать</p>
+  </div>
+</section>
+
+<!-- INVESTIGATION -->
+<section id="investigation">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div>
+        <div class="sec-num">06 — Расследование</div>
+        <h2>Телеграмма, которая <i>потрясла</i> Шотландию</h2>
+      </div>
+      <p class="sec-desc">Капитан «Hesperus» Джеймс Харви отправил в Северное управление маяков одно из самых жутких сообщений в морской истории.</p>
+    </div>
+    <div class="invest-grid">
+      <div class="reveal">
+        <div class="telegram">
+          <h3>Телеграмма · 26 декабря 1900 · Breasclete</h3>
+          <blockquote>«Ужасное несчастье случилось на Фланнанах. Трое смотрителей — Дюкат, Маршалл и сменный — исчезли с острова. Часы остановились, и всё указывает на то, что несчастье произошло около недели назад. Бедняги, должно быть, их сдуло с обрывов или они утонули, пытаясь закрепить кран.»</blockquote>
+          <div class="from">— Капитан Джеймс Харви, судно «Hesperus»</div>
+        </div>
+        <div class="timeline" style="margin-top:28px">
+          <div class="timeline-item"><div class="timeline-date">15 ДЕКАБРЯ</div><div><h4>«Archtor» не видит света</h4><p>Пароход из Филадельфии фиксирует: маяк погашен в плохую погоду. Сообщение передают в Лит 18 декабря.</p></div></div>
+          <div class="timeline-item"><div class="timeline-date">20 ДЕКАБРЯ</div><div><h4>«Hesperus» не может выйти</h4><p>Спасательное судно задерживается из-за шторма в Бресклите, остров Льюис.</p></div></div>
+          <div class="timeline-item"><div class="timeline-date">26 ДЕКАБРЯ</div><div><h4>Полдень: пустой остров</h4><p>Мур находит башню пустой. Никого на острове. Поиск по скалам — безрезультатно.</p></div></div>
+          <div class="timeline-item"><div class="timeline-date">29 ДЕКАБРЯ</div><div><h4>Мьюрхед прибывает</h4><p>Суперинтендант, лично знавший всех троих, начинает официальное расследование. Тела так и не находят.</p></div></div>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="ship-card">
+          <div style="font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber)">Спасательное судно</div>
+          <h3>«Hesperus»</h3>
+          <p>Именно «Hesperus» — а не «Archtor» — нашёл пустой маяк. «Archtor» лишь первым заметил погасший свет. На борту «Hesperus» были сменный смотритель Джозеф Мур и команда, которая первой поднялась на скалу.</p>
+          <div class="ship-stats">
+            <div><b>160</b><span>ступеней до башни</span></div>
+            <div><b>11 дней</b><span>маяк был тёмным</span></div>
+            <div><b>1</b><span>плащ остался внутри</span></div>
+            <div><b>0</b><span>следов борьбы</span></div>
+          </div>
+        </div>
+        <div class="img-frame" style="margin-top:18px;aspect-ratio:16/10">
+          <img src="https://images.pexels.com/photos/11084510/pexels-photo-11084510.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200" alt="Волны у скал">
+          <div class="img-caption"><span><b>ЗАПАДНАЯ ПРИСТАНЬ</b> · РАЗРУШЕНА</span><span>КРАН СОРВАН</span></div>
+        </div>
+        <p style="color:var(--ink-dim);line-height:1.8;margin-top:18px;font-size:14px">Западная посадочная площадка была полностью разрушена: ограждение сорвано, кран для подъёма грузов вырван с корнем. Это главная улика в пользу волны-убийцы — гигантской волны, которая обрушилась на скалу и унесла людей, вышедших закрепить оборудование.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="mono" style="margin-bottom:12px">Flannan Isles Lighthouse · 1900–2026</div>
+      <p>Интерактивное расследование. Океан на Canvas, дождь, туман и звук ветра генерируются кодом в реальном времени. Исторические факты сверены с материалами Северного управления маяков и исследованием Майка Дэша.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+      <span class="mono">Свет погас. Люди — нет. <a href="https://untoldarchive.com/ru/">UntoldArchive.com</a></span>
+      <button class="top-btn" id="toTop">↑ К началу расследования</button>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ============ PURE JS — NO LIBRARIES ============ */
+(function(){
+'use strict';
+
+/* ---------- Stars ---------- */
+var starsBox = document.getElementById('stars');
+for(var i=0;i<90;i++){
+  var s=document.createElement('span');
+  s.className='star';
+  var sz=(Math.random()*2+1).toFixed(1);
+  s.style.width=sz+'px'; s.style.height=sz+'px';
+  s.style.left=(Math.random()*100)+'%';
+  s.style.top=(Math.random()*55)+'%';
+  s.style.animationDelay=(Math.random()*3)+'s';
+  starsBox.appendChild(s);
+}
+
+/* ---------- Header + progress ---------- */
+var header=document.getElementById('header');
+var progress=document.getElementById('progress');
+function onScroll(){
+  var y=window.scrollY||document.documentElement.scrollTop;
+  header.classList.toggle('scrolled', y>40);
+  var h=document.documentElement.scrollHeight-window.innerHeight;
+  progress.style.width=(h>0?(y/h*100):0)+'%';
+}
+window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+/* ---------- Reveal on scroll ---------- */
+var io=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target);} });
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+
+/* ---------- Counters ---------- */
+var counters=document.querySelectorAll('[data-count]');
+var cio=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(!e.isIntersecting) return;
+    var el=e.target, target=+el.getAttribute('data-count'), start=null;
+    function step(ts){
+      if(!start) start=ts;
+      var p=Math.min((ts-start)/1200,1);
+      el.textContent=Math.round(target*(1-Math.pow(1-p,3)));
+      if(p<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+    cio.unobserve(el);
+  });
+},{threshold:.5});
+counters.forEach(function(c){ cio.observe(c); });
+
+/* ---------- Ocean canvas + rain + lightning ---------- */
+var canvas=document.getElementById('oceanCanvas');
+var ctx=canvas.getContext('2d');
+var W=0,H=0, storm=35, t=0, drops=[];
+function resize(){
+  var r=canvas.getBoundingClientRect();
+  W=canvas.width=Math.max(300,Math.floor(r.width));
+  H=canvas.height=Math.max(120,Math.floor(r.height));
+}
+resize(); window.addEventListener('resize',resize);
+
+function makeDrops(){
+  var need=Math.floor(storm*1.6);
+  while(drops.length<need) drops.push({x:Math.random()*W,y:Math.random()*H,l:10+Math.random()*14,v:6+Math.random()*8});
+  drops.length=need;
+}
+makeDrops();
+
+function drawOcean(){
+  t+=0.016;
+  ctx.clearRect(0,0,W,H);
+  var amp=4+(storm/100)*16;
+  var layers=[
+    {y:H*0.35, c:'rgba(20,38,64,.55)', sp:1.1, a:amp},
+    {y:H*0.55, c:'rgba(14,28,50,.75)', sp:1.6, a:amp*1.25},
+    {y:H*0.78, c:'rgba(7,14,28,.95)', sp:2.2, a:amp*1.5}
+  ];
+  layers.forEach(function(L,idx){
+    ctx.beginPath();
+    ctx.moveTo(0,H);
+    for(var x=0;x<=W;x+=6){
+      var y=L.y + Math.sin(x*0.012 + t*L.sp + idx*2)*L.a + Math.sin(x*0.03 + t*L.sp*1.7)*L.a*0.35;
+      ctx.lineTo(x,y);
+    }
+    ctx.lineTo(W,H); ctx.closePath();
+    ctx.fillStyle=L.c; ctx.fill();
+    /* foam line */
+    ctx.beginPath();
+    for(var x2=0;x2<=W;x2+=6){
+      var y2=L.y + Math.sin(x2*0.012 + t*L.sp + idx*2)*L.a + Math.sin(x2*0.03 + t*L.sp*1.7)*L.a*0.35;
+      if(x2===0) ctx.moveTo(x2,y2); else ctx.lineTo(x2,y2);
+    }
+    ctx.strokeStyle='rgba(236,229,211,'+(0.10+storm/100*0.22)+')';
+    ctx.lineWidth=1.2; ctx.stroke();
+  });
+  /* rain */
+  if(storm>4){
+    ctx.strokeStyle='rgba(180,200,230,'+(0.12+storm/100*0.35)+')';
+    ctx.lineWidth=1;
+    ctx.beginPath();
+    drops.forEach(function(d){
+      ctx.moveTo(d.x,d.y); ctx.lineTo(d.x-2,d.y+d.l);
+      d.y+=d.v; d.x-=1.2;
+      if(d.y>H){ d.y=-20; d.x=Math.random()*W; }
+    });
+    ctx.stroke();
+  }
+  requestAnimationFrame(drawOcean);
+}
+drawOcean();
+
+/* lightning */
+var lightning=document.getElementById('lightning');
+setInterval(function(){
+  if(storm>65 && Math.random()>0.55){
+    lightning.style.opacity='0.55';
+    setTimeout(function(){ lightning.style.opacity='0'; },90);
+    setTimeout(function(){ lightning.style.opacity='0.35'; },170);
+    setTimeout(function(){ lightning.style.opacity='0'; },280);
+  }
+},2600);
+
+/* ---------- Storm control ---------- */
+var range=document.getElementById('stormRange');
+var stormVal=document.getElementById('stormVal');
+var stormText=document.getElementById('stormText');
+var waveText=document.getElementById('waveText');
+var fog1=document.getElementById('fog1'), fog2=document.getElementById('fog2');
+function stormLabel(v){
+  if(v<20) return 'Ветер: штиль';
+  if(v<45) return 'Ветер: свежий';
+  if(v<70) return 'Ветер: штормовой';
+  if(v<90) return 'Ветер: ураганный';
+  return 'Ветер: катастрофический';
+}
+function applyStorm(){
+  storm=+range.value;
+  stormVal.textContent=storm+'%';
+  stormText.textContent=stormLabel(storm);
+  waveText.textContent='Волны: '+Math.round(0.5+storm/100*11)+' м';
+  fog1.style.opacity=(0.35+storm/100*0.65).toFixed(2);
+  fog2.style.opacity=(0.25+storm/100*0.75).toFixed(2);
+  makeDrops();
+  if(audioCtx && audioGain) audioGain.gain.value = 0.02 + storm/100*0.14;
+}
+range.addEventListener('input',applyStorm); applyStorm();
+
+/* ---------- Lighthouse beam rotation + parallax ---------- */
+var beam=document.getElementById('beamGroup');
+var beamGlow=document.getElementById('beamGlow');
+var lighthouseWrap=document.getElementById('lighthouseWrap');
+var mouseX=0, mouseY=0;
+document.addEventListener('mousemove',function(e){
+  mouseX=(e.clientX/window.innerWidth-0.5);
+  mouseY=(e.clientY/window.innerHeight-0.5);
+  fog1.style.marginLeft=(mouseX*-30)+'px';
+  fog2.style.marginLeft=(mouseX*22)+'px';
+});
+var beamAngle=0;
+(function animateBeam(){
+  beamAngle+=0.35 + storm/100*0.9;
+  beam.style.transform='rotate('+beamAngle+'deg)';
+  beamGlow.style.transform='translate(-50%,-50%) rotate('+beamAngle+'deg)';
+  lighthouseWrap.style.transform='translateX(calc(-50% + '+(mouseX*10)+'px)) translateY('+(mouseY*4)+'px)';
+  requestAnimationFrame(animateBeam);
+})();
+
+/* ---------- Logbook data + typewriter ---------- */
+var logs=[
+  {date:'12 декабря', short:'12.12 · Ветер', title:'12 декабря 1900', weather:'Ветер: западный, 60 узлов\nВидимость: 200 м', text:'Сильные ветры, каких не видел за двадцать лет. Дюкат очень тих. МакАртур плачет.', badge:'Поздняя запись · спорна', warn:true, storm:62, note:'Шторм: сильный'},
+  {date:'13 декабря', short:'13.12 · Шторм', title:'13 декабря 1900', weather:'Ветер: штормовой\nМоре: бурное', text:'Шторм продолжается. Все трое молились. Лампа горит, но свет едва пробивает тьму.', badge:'Поздняя запись · спорна', warn:true, storm:78, note:'Шторм: очень сильный'},
+  {date:'15 декабря', short:'15.12 · Тишина', title:'15 декабря 1900', weather:'Ветер: стих\nМоре: спокойно', text:'Шторм закончился, море спокойно. Бог над всеми.\n\n— Последняя запись. Дальше в журнале пусто. Свет маяка погас в этот вечер.', badge:'Последняя запись', warn:false, storm:18, note:'Шторм: стих'},
+  {date:'26 декабря', short:'26.12 · Hesperus', title:'26 декабря 1900 · Полдень', weather:'Ветер: умеренный\nВидимость: хорошая', text:'«Hesperus» прибывает в полдень.\n\nНа острове — ни души. Дверь башни заперта. Внутри: остановившиеся часы, недоеденный ужин, опрокинутый стул. Троих мужчин нет. Поиск по скалам ничего не дал.', badge:'Обнаружение', warn:false, storm:30, note:'Шторм: умеренный'}
+];
+var logDates=document.getElementById('logDates');
+var logTitle=document.getElementById('logTitle');
+var logWeather=document.getElementById('logWeather');
+var logText=document.getElementById('logText');
+var logBadge=document.getElementById('logBadge');
+var logStormBar=document.getElementById('logStormBar');
+var logNote=document.getElementById('logNote');
+var typeTimer=null;
+
+function typeText(text){
+  clearInterval(typeTimer);
+  logText.textContent='';
+  var i=0;
+  typeTimer=setInterval(function(){
+    logText.textContent=text.slice(0,++i);
+    if(i>=text.length) clearInterval(typeTimer);
+  },22);
+}
+function selectLog(idx){
+  var L=logs[idx];
+  document.querySelectorAll('.log-date-btn').forEach(function(b,j){ b.classList.toggle('active',j===idx); });
+  logTitle.textContent=L.title;
+  logWeather.textContent=L.weather;
+  logBadge.textContent=L.badge;
+  logBadge.className='badge'+(L.warn?' warn':'');
+  logNote.textContent=L.note;
+  logStormBar.style.width='0%';
+  setTimeout(function(){ logStormBar.style.width=L.storm+'%'; },60);
+  typeText(L.text);
+}
+logs.forEach(function(L,i){
+  var b=document.createElement('button');
+  b.className='log-date-btn'+(i===0?' active':'');
+  b.innerHTML='<b>'+L.date+'</b><span>'+L.short+'</span>';
+  b.addEventListener('click',function(){ selectLog(i); });
+  logDates.appendChild(b);
+});
+selectLog(0);
+
+/* ---------- Clues ---------- */
+var clues=[
+  {k:'Улика 01', t:'Остановившиеся часы', s:'Время замерло', text:'Все часы в башне остановились. По ним можно было понять: что-то случилось внезапно, около недели назад — примерно 15 декабря, в тот же вечер, когда «Archtor» увидел погасший свет.', fact:'ФАКТ: Остановка часов + погасший свет = одна и та же ночь. 15 декабря 1900.', img:'https://images.pexels.com/photos/33869109/pexels-photo-33869109.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200'},
+  {k:'Улика 02', t:'Недоеденный ужин', s:'Стул опрокинут', text:'На столе — полусъеденная еда: мясо, солёные огурцы и картофель. Один стул опрокинут, словно кто-то вскочил из-за стола. Кровать не заправлена. Канарейка в клетке умирала от голода.', fact:'ФАКТ: Люди не собирались уходить. Они были посреди обычного вечера.', img:'https://images.pexels.com/photos/8043640/pexels-photo-8043640.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200'},
+  {k:'Улика 03', t:'Дверь на замке', s:'Но внутри пусто', text:'Входная дверь башни была заперта снаружи — Мур открыл её своим ключом. При этом внутри никого не было. Значит, трое вышли наружу и не вернулись, либо их вынесли волны.', fact:'ФАКТ: Запертая дверь исключает версию «ушли по своей воле и не вернулись» без следа.', img:'https://images.pexels.com/photos/18121523/pexels-photo-18121523.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200'},
+  {k:'Улика 04', t:'Два плаща пропали', s:'Третий — на месте', text:'Из трёх комплектов штормовых плащей (oilskins) на месте оказался только один — плащ МакАртура. Два других исчезли вместе с Дюкатом и Маршаллом. Они вышли в шторм в защитной одежде.', fact:'ФАКТ: Дюкат и Маршалл вышли наружу в шторм. МакАртур, возможно, остался — или вышел без плаща.', img:'https://images.pexels.com/photos/11084510/pexels-photo-11084510.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200'},
+  {k:'Улика 05', t:'Разрушенная пристань', s:'Кран сорван', text:'Западная посадочная площадка была полностью уничтожена: ограждение снесено, подъёмный кран вырван. Такую разрушительную силу могла дать только гигантская волна, обрушившаяся на скалу.', fact:'ФАКТ: Разрушения на высоте — главный аргумент в пользу волны-убийцы.', img:'https://images.pexels.com/photos/16277006/pexels-photo-16277006.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200'},
+  {k:'Улика 06', t:'Журнал на месте', s:'Ничего не украдено', text:'Журнал, инструменты, личные вещи — всё на своих местах. Никаких следов борьбы, взлома или кражи. Остров не посещал никто. Людей просто не стало.', fact:'ФАКТ: Отсутствие следов насилия делает версию нападения крайне маловероятной.', img:'https://images.pexels.com/photos/33869109/pexels-photo-33869109.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200'}
+];
+var cluesGrid=document.getElementById('cluesGrid');
+var clueKicker=document.getElementById('clueKicker');
+var clueTitle=document.getElementById('clueTitle');
+var clueText=document.getElementById('clueText');
+var clueFact=document.getElementById('clueFact');
+var clueImg=document.getElementById('clueImg');
+function selectClue(i){
+  var c=clues[i];
+  document.querySelectorAll('.clue-btn').forEach(function(b,j){ b.classList.toggle('active',j===i); });
+  clueKicker.textContent=c.k;
+  clueTitle.textContent=c.t;
+  clueText.textContent=c.text;
+  clueFact.textContent=c.fact;
+  clueImg.src=c.img;
+}
+clues.forEach(function(c,i){
+  var b=document.createElement('button');
+  b.className='clue-btn'+(i===0?' active':'');
+  b.innerHTML='<small>'+c.k+'</small><b>'+c.t+'</b><span>'+c.s+'</span>';
+  b.addEventListener('click',function(){ selectClue(i); });
+  cluesGrid.appendChild(b);
+});
+selectClue(0);
+
+/* ---------- Theories voting ---------- */
+var theories=[
+  {t:'Волна-убийца', tag:'Главная версия', p:'Гигантская волна обрушилась на скалу, разрушила западную пристань и смыла Дюката и Маршалла, вышедших закрепить кран. МакАртур, вышедший следом без плаща, погиб в той же волне. Тела унесло в Атлантику.', votes:1240},
+  {t:'Ссора у обрыва', tag:'Психология', p:'Вспыльчивый МакАртур спровоцировал драку у края скалы. В борьбе все трое сорвались вниз. Объясняет отсутствие следов борьбы в башне — всё произошло снаружи.', votes:860},
+  {t:'Смыло при работах', tag:'Официальная', p:'По версии капитана Харви, мужчин сдуло ветром или они утонули, пытаясь закрепить кран на западной пристани. Самая прозаичная версия — и самая ранняя.', votes:540},
+  {t:'Сверхъестественное', tag:'Мистика', p:'В 1900-е говорили о морских чудовищах и кораблях-призраках. Сегодня — о НЛО и порталах. Версия не имеет доказательств, но именно она сделала историю легендой.', votes:310}
+];
+var theoriesGrid=document.getElementById('theoriesGrid');
+var totalVotesEl=document.getElementById('totalVotes');
+var voted=false;
+function renderTheories(){
+  theoriesGrid.innerHTML='';
+  var total=theories.reduce(function(a,b){return a+b.votes;},0);
+  theories.forEach(function(th,i){
+    var pct=Math.round(th.votes/total*100);
+    var card=document.createElement('div');
+    card.className='theory';
+    card.innerHTML=
+      '<div class="theory-top"><h3>'+th.t+'</h3><span class="tag">'+th.tag+'</span></div>'+
+      '<p>'+th.p+'</p>'+
+      '<div class="vote-row">'+
+        '<button class="vote-btn'+(voted===i?' voted':'')+'" data-i="'+i+'">'+(voted===i?'✓ Ваш голос':'Поддерживаю')+'</button>'+
+        '<div class="vote-bar"><i style="width:'+pct+'%"></i></div>'+
+        '<span class="vote-pct">'+pct+'%</span>'+
+      '</div>'+
+      '<div class="vote-count">'+th.votes.toLocaleString('ru-RU')+' голосов</div>';
+    theoriesGrid.appendChild(card);
+  });
+  totalVotesEl.textContent='Всего голосов: '+total.toLocaleString('ru-RU')+' · '+(voted===false?'Нажмите «Поддерживаю», чтобы проголосовать':'Вы проголосовали за: '+theories[voted].t);
+  theoriesGrid.querySelectorAll('.vote-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var idx=+btn.getAttribute('data-i');
+      if(voted===idx) return;
+      if(voted!==false) theories[voted].votes--;
+      theories[idx].votes++;
+      voted=idx;
+      renderTheories();
+    });
+  });
+}
+renderTheories();
+
+/* ---------- Keeper tilt ---------- */
+document.querySelectorAll('.keeper').forEach(function(card){
+  card.addEventListener('mousemove',function(e){
+    var r=card.getBoundingClientRect();
+    var rx=((e.clientY-r.top)/r.height-0.5)*-8;
+    var ry=((e.clientX-r.left)/r.width-0.5)*8;
+    card.style.transform='perspective(900px) rotateX('+rx+'deg) rotateY('+ry+'deg) translateY(-4px)';
+  });
+  card.addEventListener('mouseleave',function(){ card.style.transform=''; });
+});
+
+/* ---------- Ocean sound via Web Audio API (generated, no files) ---------- */
+var audioCtx=null, audioGain=null, soundOn=false;
+var soundBtn=document.getElementById('soundBtn');
+soundBtn.addEventListener('click',function(){
+  if(!audioCtx){
+    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    var len=audioCtx.sampleRate*2;
+    var buffer=audioCtx.createBuffer(1,len,audioCtx.sampleRate);
+    var data=buffer.getChannelData(0);
+    for(var i=0;i<len;i++) data[i]=Math.random()*2-1;
+    var src=audioCtx.createBufferSource();
+    src.buffer=buffer; src.loop=true;
+    var filter=audioCtx.createBiquadFilter();
+    filter.type='lowpass'; filter.frequency.value=420;
+    audioGain=audioCtx.createGain();
+    audioGain.gain.value=0.02+storm/100*0.14;
+    src.connect(filter); filter.connect(audioGain); audioGain.connect(audioCtx.destination);
+    src.start();
+  }
+  soundOn=!soundOn;
+  if(soundOn){ audioCtx.resume(); audioGain.gain.value=0.02+storm/100*0.14; soundBtn.classList.add('active'); soundBtn.textContent='◉ Звук: вкл'; }
+  else { audioGain.gain.value=0; soundBtn.classList.remove('active'); soundBtn.textContent='◉ Звук океана'; }
+});
+
+/* ---------- To top ---------- */
+document.getElementById('toTop').addEventListener('click',function(){
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+
+})();
+</script>
+</body>
+</html>
